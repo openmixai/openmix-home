@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="OpenMix — 统一 AI 模型 API 网关。One API for all models. OpenAI 兼容，智能路由，透明计费。">
+    <meta name="keywords" content="OpenMix, AI API, LLM, OpenAI compatible, 模型聚合">
+    <meta property="og:title" content="OpenMix — Unified AI API">
+    <meta property="og:description" content="One API key for GPT-4o, Claude, Gemini, Qwen, and 100+ models.">
+    <meta property="og:type" content="website">
+    <title>OpenMix — One API for All AI Models</title>
+    <link rel="stylesheet" href="assets/fonts/fonts.css">
+    <script src="assets/vendor/tailwindcss.js"></script>
+    <link rel="stylesheet" href="assets/vendor/font-awesome/css/font-awesome.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        surface: '#08090d',
+                        elevated: '#0f1118',
+                        line: 'rgba(255,255,255,0.08)',
+                        accent: '#22d3a3',
+                        'accent-dim': '#14b897',
+                        violet: '#8b5cf6',
+                    },
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
+                    },
+                    boxShadow: {
+                        glow: '0 0 80px -20px rgba(34, 211, 163, 0.35)',
+                        card: '0 0 0 1px rgba(255,255,255,0.06), 0 24px 48px -24px rgba(0,0,0,0.5)',
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .text-gradient {
+                background-clip: text;
+                -webkit-background-clip: text;
+                color: transparent;
+                background-image: linear-gradient(120deg, #5eead4 0%, #22d3a3 40%, #a78bfa 100%);
+            }
+            .mesh-bg {
+                background-color: #08090d;
+                background-image:
+                    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(34, 211, 163, 0.18), transparent),
+                    radial-gradient(ellipse 60% 40% at 100% 0%, rgba(139, 92, 246, 0.12), transparent),
+                    linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+                background-size: 100% 100%, 100% 100%, 48px 48px, 48px 48px;
+            }
+            .card-hover {
+                transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+            }
+            .card-hover:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 0 0 1px rgba(34, 211, 163, 0.15), 0 24px 48px -20px rgba(0, 0, 0, 0.6);
+            }
+            .model-tag {
+                @apply px-2 py-0.5 rounded-md text-xs font-medium bg-white/5 text-accent border border-white/10;
+            }
+        }
+    </style>
+</head>
+<body class="mesh-bg text-zinc-300 font-sans antialiased selection:bg-accent/30 selection:text-white">
+    <!-- Nav -->
+    <nav class="fixed top-0 w-full z-50 border-b border-line bg-surface/75 backdrop-blur-xl">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <a href="#" class="flex items-baseline gap-1.5 group">
+                    <span class="text-xl font-extrabold tracking-tight text-gradient">OpenMix</span>
+                    <span class="text-xs text-zinc-500 font-medium">.ai</span>
+                </a>
+                <div class="hidden lg:flex items-center gap-8 text-sm font-medium">
+                    <a href="#features" class="text-zinc-400 hover:text-white transition-colors" data-i18n="nav.features">功能</a>
+                    <a href="#models" class="text-zinc-400 hover:text-white transition-colors" data-i18n="nav.models">模型</a>
+                    <a href="#docs" class="text-zinc-400 hover:text-white transition-colors" data-i18n="nav.docs">文档</a>
+                    <a href="#pricing" class="text-zinc-400 hover:text-white transition-colors" data-i18n="nav.pricing">定价</a>
+                    <a href="admin" class="text-zinc-400 hover:text-white transition-colors" data-i18n="nav.admin">控制台</a>
+                </div>
+                <div class="flex items-center gap-2 sm:gap-3">
+                    <div class="flex rounded-lg border border-line bg-elevated p-0.5 text-xs font-semibold">
+                        <button type="button" id="lang-zh" class="lang-btn px-2.5 py-1 rounded-md bg-white/10 text-white" aria-pressed="true">中文</button>
+                        <button type="button" id="lang-en" class="lang-btn px-2.5 py-1 rounded-md text-zinc-500 hover:text-zinc-300" aria-pressed="false">EN</button>
+                    </div>
+                    <a href="#debug" class="hidden sm:inline-flex items-center px-3 py-2 rounded-lg border border-line text-sm font-medium text-zinc-200 hover:bg-white/5 transition-colors" data-i18n="nav.try">在线试用</a>
+                    <a href="admin/login" class="inline-flex items-center px-4 py-2 rounded-lg bg-accent text-surface text-sm font-semibold hover:bg-accent-dim transition-colors shadow-glow" data-i18n="nav.login">登录</a>
+                    <button type="button" id="menu-btn" class="lg:hidden p-2 rounded-lg border border-line text-zinc-300" aria-expanded="false" aria-controls="mobile-menu">
+                        <i class="fa fa-bars" aria-hidden="true"></i>
+                    </button>
+                </div>
+            </div>
+            <div id="mobile-menu" class="lg:hidden hidden border-t border-line py-4 flex flex-col gap-3 text-sm font-medium">
+                <a href="#features" class="text-zinc-400 hover:text-white" data-i18n="nav.features">功能</a>
+                <a href="#models" class="text-zinc-400 hover:text-white" data-i18n="nav.models">模型</a>
+                <a href="#docs" class="text-zinc-400 hover:text-white" data-i18n="nav.docs">文档</a>
+                <a href="#pricing" class="text-zinc-400 hover:text-white" data-i18n="nav.pricing">定价</a>
+                <a href="admin" class="text-zinc-400 hover:text-white" data-i18n="nav.admin">控制台</a>
+                <a href="#debug" class="text-accent" data-i18n="nav.try">在线试用</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="relative pt-28 pb-16 sm:pt-32 sm:pb-24 overflow-hidden">
+        <div class="absolute inset-0 pointer-events-none">
+            <div class="absolute top-40 left-1/2 -translate-x-1/2 w-[min(90vw,720px)] h-64 bg-accent/10 blur-[100px] rounded-full"></div>
+        </div>
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="max-w-4xl mx-auto text-center">
+                <p class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-line bg-elevated/80 text-xs font-medium text-zinc-400 mb-6">
+                    <span class="w-1.5 h-1.5 rounded-full bg-accent animate-pulse"></span>
+                    <span data-i18n="hero.badge">OpenAI 兼容 · 智能路由 · 透明计费</span>
+                </p>
+                <h1 class="text-[clamp(2rem,5vw,3.5rem)] font-extrabold tracking-tight text-white leading-[1.1] mb-6">
+                    <span data-i18n="hero.title1">一个</span> <span class="text-gradient" data-i18n="hero.title2">API Key</span><span data-i18n="hero.title3">，</span><br class="hidden sm:block">
+                    <span data-i18n="hero.title4">调用全球主流 AI 模型</span>
+                </h1>
+                <p class="text-lg sm:text-xl text-zinc-400 max-w-2xl mx-auto mb-10 leading-relaxed" data-i18n="hero.sub">
+                    兼容 OpenAI 标准，无缝对接 GPT-4o、Claude、Gemini、通义、文心等 100+ 模型。统一计费、智能路由、企业级安全。
+                </p>
+                <div class="flex flex-col sm:flex-row gap-3 justify-center mb-14">
+                    <a href="admin/register" class="inline-flex justify-center items-center px-8 py-3.5 rounded-xl bg-accent text-surface font-semibold hover:bg-accent-dim transition-all shadow-glow text-base" data-i18n="hero.cta1">获取 API Key</a>
+                    <a href="#docs" class="inline-flex justify-center items-center px-8 py-3.5 rounded-xl border border-line bg-elevated/50 text-white font-semibold hover:bg-white/5 transition-colors text-base" data-i18n="hero.cta2">查看文档</a>
+                </div>
+            </div>
+
+            <!-- Stats strip (OpenRouter-style) -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 max-w-5xl mx-auto mb-16">
+                <div class="rounded-2xl border border-line bg-elevated/60 p-5 text-center card-hover">
+                    <div class="text-2xl sm:text-3xl font-bold text-white tabular-nums">100+</div>
+                    <div class="text-xs sm:text-sm text-zinc-500 mt-1" data-i18n="stats.models">模型</div>
+                </div>
+                <div class="rounded-2xl border border-line bg-elevated/60 p-5 text-center card-hover">
+                    <div class="text-2xl sm:text-3xl font-bold text-white tabular-nums">99.9%</div>
+                    <div class="text-xs sm:text-sm text-zinc-500 mt-1" data-i18n="stats.sla">可用性目标</div>
+                </div>
+                <div class="rounded-2xl border border-line bg-elevated/60 p-5 text-center card-hover">
+                    <div class="text-2xl sm:text-3xl font-bold text-white tabular-nums">1</div>
+                    <div class="text-xs sm:text-sm text-zinc-500 mt-1" data-i18n="stats.api">统一接口</div>
+                </div>
+                <div class="rounded-2xl border border-line bg-elevated/60 p-5 text-center card-hover">
+                    <div class="text-2xl sm:text-3xl font-bold text-white tabular-nums">0</div>
+                    <div class="text-xs sm:text-sm text-zinc-500 mt-1" data-i18n="stats.sub">强制月租</div>
+                </div>
+            </div>
+
+            <!-- Playground card -->
+            <div id="debug" class="max-w-3xl mx-auto rounded-2xl border border-line bg-elevated/80 backdrop-blur-sm shadow-card p-6 sm:p-8">
+                <div class="flex items-center justify-between gap-4 mb-5">
+                    <h2 class="text-lg font-semibold text-white" data-i18n="playground.title">在线快速试用</h2>
+                    <span class="text-xs text-zinc-500 font-mono">POST /v1/chat/completions</span>
+                </div>
+                <div class="flex flex-col gap-3">
+                    <div class="flex flex-col sm:flex-row gap-2">
+                        <select class="flex-1 bg-surface border border-line rounded-xl px-4 py-2.5 text-sm font-mono text-zinc-200 focus:outline-none focus:ring-2 focus:ring-accent/40" aria-label="Model">
+                            <option>openai/gpt-4o</option>
+                            <option>anthropic/claude-3-5-sonnet</option>
+                            <option>google/gemini-1.5-pro</option>
+                            <option>qwen/qwen-72b</option>
+                        </select>
+                        <input type="password" data-i18n-placeholder="playground.keyph" placeholder="你的 API Key" class="flex-1 bg-surface border border-line rounded-xl px-4 py-2.5 text-sm font-mono placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-accent/40">
+                    </div>
+                    <textarea data-i18n-placeholder="playground.msgh" placeholder="输入消息..." rows="4" class="w-full bg-surface border border-line rounded-xl px-4 py-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-accent/40"></textarea>
+                    <button type="button" class="w-full sm:w-auto sm:self-end inline-flex justify-center items-center gap-2 px-6 py-2.5 rounded-xl bg-white/10 text-white font-semibold border border-line hover:bg-white/15 transition-colors">
+                        <span data-i18n="playground.send">发送请求</span>
+                        <i class="fa fa-paper-plane text-xs opacity-80" aria-hidden="true"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features -->
+    <section id="features" class="py-20 border-t border-line">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-14 max-w-2xl mx-auto">
+                <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight mb-4" data-i18n="feat.heading">为生产环境设计的统一网关</h2>
+                <p class="text-zinc-400 text-lg" data-i18n="feat.sub">更少集成成本，更高可用与可观测性。</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <article class="rounded-2xl border border-line bg-elevated/50 p-7 card-hover">
+                    <div class="w-11 h-11 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center mb-5">
+                        <i class="fa fa-plug text-accent text-lg"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-white mb-2" data-i18n="feat.f1t">OpenAI 全兼容</h3>
+                    <p class="text-zinc-400 text-sm leading-relaxed" data-i18n="feat.f1d">零改造切换：替换 base URL 与 Key 即可，支持 chat、embeddings 等常用端点。</p>
+                </article>
+                <article class="rounded-2xl border border-line bg-elevated/50 p-7 card-hover">
+                    <div class="w-11 h-11 rounded-xl bg-violet/10 border border-violet/20 flex items-center justify-center mb-5">
+                        <i class="fa fa-sitemap text-violet text-lg"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-white mb-2" data-i18n="feat.f2t">多模型聚合</h3>
+                    <p class="text-zinc-400 text-sm leading-relaxed" data-i18n="feat.f2d">国内外主流模型一站式接入，持续扩充，一个入口覆盖研发与业务场景。</p>
+                </article>
+                <article class="rounded-2xl border border-line bg-elevated/50 p-7 card-hover">
+                    <div class="w-11 h-11 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center mb-5">
+                        <i class="fa fa-random text-accent text-lg"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-white mb-2" data-i18n="feat.f3t">智能路由</h3>
+                    <p class="text-zinc-400 text-sm leading-relaxed" data-i18n="feat.f3d">优选节点、负载与故障转移策略可配，降低延迟与中断风险。</p>
+                </article>
+                <article class="rounded-2xl border border-line bg-elevated/50 p-7 card-hover">
+                    <div class="w-11 h-11 rounded-xl bg-violet/10 border border-violet/20 flex items-center justify-center mb-5">
+                        <i class="fa fa-line-chart text-violet text-lg"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-white mb-2" data-i18n="feat.f4t">Token 级计费</h3>
+                    <p class="text-zinc-400 text-sm leading-relaxed" data-i18n="feat.f4d">按用量结算，实时用量与额度可视化，成本可控可审计。</p>
+                </article>
+                <article class="rounded-2xl border border-line bg-elevated/50 p-7 card-hover">
+                    <div class="w-11 h-11 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center mb-5">
+                        <i class="fa fa-key text-accent text-lg"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-white mb-2" data-i18n="feat.f5t">密钥与权限</h3>
+                    <p class="text-zinc-400 text-sm leading-relaxed" data-i18n="feat.f5d">多 Key、分级权限与一键轮换，满足团队协作与安全基线。</p>
+                </article>
+                <article class="rounded-2xl border border-line bg-elevated/50 p-7 card-hover">
+                    <div class="w-11 h-11 rounded-xl bg-violet/10 border border-violet/20 flex items-center justify-center mb-5">
+                        <i class="fa fa-shield text-violet text-lg"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-white mb-2" data-i18n="feat.f6t">安全合规</h3>
+                    <p class="text-zinc-400 text-sm leading-relaxed" data-i18n="feat.f6d">限流、审计日志与传输安全，可对接企业策略与私有化部署路径。</p>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- Models -->
+    <section id="models" class="py-20 border-t border-line bg-elevated/30">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6 mb-12">
+                <div>
+                    <h2 class="text-3xl font-extrabold text-white tracking-tight mb-2" data-i18n="models.heading">支持的模型与厂商</h2>
+                    <p class="text-zinc-400" data-i18n="models.sub">持续更新，覆盖主流实验室与云厂商。</p>
+                </div>
+                <a href="#docs" class="text-sm font-semibold text-accent hover:text-accent-dim transition-colors inline-flex items-center gap-1" data-i18n="models.cta">在文档中查看完整列表 <i class="fa fa-arrow-right text-xs"></i></a>
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                <div class="rounded-xl border border-line bg-surface/80 p-4 text-center card-hover"><span class="model-tag">OpenAI</span><p class="mt-2 text-sm font-mono text-zinc-300">gpt-4o</p></div>
+                <div class="rounded-xl border border-line bg-surface/80 p-4 text-center card-hover"><span class="model-tag">Anthropic</span><p class="mt-2 text-sm font-mono text-zinc-300">claude-3-5</p></div>
+                <div class="rounded-xl border border-line bg-surface/80 p-4 text-center card-hover"><span class="model-tag">Google</span><p class="mt-2 text-sm font-mono text-zinc-300">gemini-1.5</p></div>
+                <div class="rounded-xl border border-line bg-surface/80 p-4 text-center card-hover"><span class="model-tag">阿里</span><p class="mt-2 text-sm font-mono text-zinc-300">qwen</p></div>
+                <div class="rounded-xl border border-line bg-surface/80 p-4 text-center card-hover"><span class="model-tag">百度</span><p class="mt-2 text-sm font-mono text-zinc-300">ernie-4</p></div>
+                <div class="rounded-xl border border-line bg-surface/80 p-4 text-center card-hover"><span class="model-tag">字节</span><p class="mt-2 text-sm font-mono text-zinc-300">doubao</p></div>
+                <div class="rounded-xl border border-line bg-surface/80 p-4 text-center card-hover"><span class="model-tag">DeepSeek</span><p class="mt-2 text-sm font-mono text-zinc-300">deepseek-chat</p></div>
+                <div class="rounded-xl border border-line bg-surface/80 p-4 text-center card-hover"><span class="model-tag">智谱</span><p class="mt-2 text-sm font-mono text-zinc-300">glm-4</p></div>
+                <div class="rounded-xl border border-line bg-surface/80 p-4 text-center card-hover"><span class="model-tag">MiniMax</span><p class="mt-2 text-sm font-mono text-zinc-300">abab6</p></div>
+                <div class="rounded-xl border border-line bg-surface/80 p-4 text-center card-hover"><span class="model-tag">讯飞</span><p class="mt-2 text-sm font-mono text-zinc-300">spark</p></div>
+                <div class="rounded-xl border border-line bg-surface/80 p-4 text-center card-hover"><span class="model-tag">Meta</span><p class="mt-2 text-sm font-mono text-zinc-300">llama-3</p></div>
+                <div class="rounded-xl border border-line bg-surface/80 p-4 text-center card-hover"><span class="model-tag">—</span><p class="mt-2 text-sm text-zinc-500" data-i18n="models.more">更多</p></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Docs -->
+    <section id="docs" class="py-20 border-t border-line">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-14 max-w-2xl mx-auto">
+                <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight mb-4" data-i18n="docs.heading">几分钟完成接入</h2>
+                <p class="text-zinc-400 text-lg" data-i18n="docs.sub">兼容 OpenAI SDK 与 REST，以下示例可直接复制运行。</p>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="rounded-2xl border border-line bg-elevated/50 overflow-hidden">
+                    <div class="flex items-center justify-between px-4 py-3 border-b border-line bg-surface/50">
+                        <span class="text-sm font-semibold text-white flex items-center gap-2"><i class="fa fa-terminal text-accent"></i> cURL</span>
+                        <button type="button" class="copy-btn text-xs text-zinc-500 hover:text-accent font-mono" data-copy="curl-code" data-i18n="docs.copy">复制</button>
+                    </div>
+                    <pre id="curl-code" class="p-4 overflow-x-auto text-xs sm:text-sm font-mono text-zinc-300 leading-relaxed bg-surface/80"><code>curl https://openmix.ai/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer sk-openmix-***" \
+  -d '{
+    "model": "openai/gpt-4o",
+    "messages": [
+      {"role": "user", "content": "Hello, OpenMix!"}
+    ],
+    "stream": true
+  }'</code></pre>
+                </div>
+                <div class="rounded-2xl border border-line bg-elevated/50 overflow-hidden">
+                    <div class="flex items-center justify-between px-4 py-3 border-b border-line bg-surface/50">
+                        <span class="text-sm font-semibold text-white flex items-center gap-2"><i class="fa fa-code text-accent"></i> Python</span>
+                        <button type="button" class="copy-btn text-xs text-zinc-500 hover:text-accent font-mono" data-copy="py-code" data-i18n="docs.copy">复制</button>
+                    </div>
+                    <pre id="py-code" class="p-4 overflow-x-auto text-xs sm:text-sm font-mono text-zinc-300 leading-relaxed bg-surface/80"><code>from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://openmix.ai/v1",
+    api_key="sk-openmix-***",
+)
+
+r = client.chat.completions.create(
+    model="qwen/qwen-72b",
+    messages=[{"role": "user", "content": "Hello!"}],
+)
+print(r.choices[0].message.content)</code></pre>
+                </div>
+            </div>
+            <p class="mt-8 text-center">
+                <a href="#" class="inline-flex items-center gap-2 text-sm font-semibold text-accent hover:text-accent-dim transition-colors" data-i18n="docs.full">完整 API 文档</a>
+            </p>
+        </div>
+    </section>
+
+    <!-- Pricing -->
+    <section id="pricing" class="py-20 border-t border-line bg-elevated/30">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-14 max-w-2xl mx-auto">
+                <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight mb-4" data-i18n="price.heading">简单透明的定价</h2>
+                <p class="text-zinc-400 text-lg" data-i18n="price.sub">按 Token 用量计费，无隐藏月租（具体以控制台为准）。</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+                <div class="rounded-2xl border border-line bg-surface/80 p-8 card-hover flex flex-col">
+                    <h3 class="text-lg font-semibold text-white" data-i18n="price.p1t">免费试用</h3>
+                    <p class="text-3xl font-extrabold text-white mt-4 mb-6">¥0</p>
+                    <ul class="text-sm text-zinc-400 space-y-3 mb-8 flex-1">
+                        <li class="flex gap-2"><i class="fa fa-check text-accent mt-0.5"></i><span data-i18n="price.p1a">入门额度</span></li>
+                        <li class="flex gap-2"><i class="fa fa-check text-accent mt-0.5"></i><span data-i18n="price.p1b">基础模型</span></li>
+                        <li class="flex gap-2"><i class="fa fa-check text-accent mt-0.5"></i><span data-i18n="price.p1c">用量统计</span></li>
+                    </ul>
+                    <a href="admin/register" class="block text-center py-2.5 rounded-xl border border-line font-semibold text-white hover:bg-white/5 transition-colors" data-i18n="price.p1btn">注册</a>
+                </div>
+                <div class="rounded-2xl border-2 border-accent/50 bg-elevated/90 p-8 card-hover flex flex-col relative shadow-glow">
+                    <div class="absolute -top-3 right-6 px-3 py-1 rounded-full bg-accent text-surface text-xs font-bold" data-i18n="price.popular">推荐</div>
+                    <h3 class="text-lg font-semibold text-white" data-i18n="price.p2t">专业版</h3>
+                    <p class="text-3xl font-extrabold text-white mt-4 mb-6">¥99<span class="text-base font-normal text-zinc-500" data-i18n="price.mo">/月</span></p>
+                    <ul class="text-sm text-zinc-400 space-y-3 mb-8 flex-1">
+                        <li class="flex gap-2"><i class="fa fa-check text-accent mt-0.5"></i><span data-i18n="price.p2a">更高额度</span></li>
+                        <li class="flex gap-2"><i class="fa fa-check text-accent mt-0.5"></i><span data-i18n="price.p2b">全模型</span></li>
+                        <li class="flex gap-2"><i class="fa fa-check text-accent mt-0.5"></i><span data-i18n="price.p2c">流式与日志</span></li>
+                    </ul>
+                    <a href="admin/upgrade" class="block text-center py-2.5 rounded-xl bg-accent text-surface font-semibold hover:bg-accent-dim transition-colors" data-i18n="price.p2btn">升级</a>
+                </div>
+                <div class="rounded-2xl border border-line bg-surface/80 p-8 card-hover flex flex-col">
+                    <h3 class="text-lg font-semibold text-white" data-i18n="price.p3t">企业版</h3>
+                    <p class="text-3xl font-extrabold text-white mt-4 mb-6" data-i18n="price.p3p">定制</p>
+                    <ul class="text-sm text-zinc-400 space-y-3 mb-8 flex-1">
+                        <li class="flex gap-2"><i class="fa fa-check text-accent mt-0.5"></i><span data-i18n="price.p3a">专属与私有化</span></li>
+                        <li class="flex gap-2"><i class="fa fa-check text-accent mt-0.5"></i><span data-i18n="price.p3b">SLA 与支持</span></li>
+                        <li class="flex gap-2"><i class="fa fa-check text-accent mt-0.5"></i><span data-i18n="price.p3c">合规与审计</span></li>
+                    </ul>
+                    <a href="#contact" class="block text-center py-2.5 rounded-xl border border-line font-semibold text-white hover:bg-white/5 transition-colors" data-i18n="price.p3btn">联系销售</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact -->
+    <section id="contact" class="py-20 border-t border-line">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="text-3xl font-extrabold text-white tracking-tight mb-4" data-i18n="contact.heading">联系我们</h2>
+            <p class="text-zinc-400 mb-10" data-i18n="contact.sub">合作、定制部署或技术支持，欢迎联络。</p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12 text-left">
+                <div class="rounded-2xl border border-line bg-elevated/50 p-6">
+                    <i class="fa fa-envelope text-accent text-xl mb-3"></i>
+                    <h3 class="font-semibold text-white text-sm mb-1" data-i18n="contact.mail">邮箱</h3>
+                    <p class="text-sm text-zinc-400 font-mono">contact@openmix.ai</p>
+                </div>
+                <div class="rounded-2xl border border-line bg-elevated/50 p-6">
+                    <i class="fa fa-github text-accent text-xl mb-3"></i>
+                    <h3 class="font-semibold text-white text-sm mb-1">GitHub</h3>
+                    <p class="text-sm text-zinc-400 font-mono">github.com/openmix</p>
+                </div>
+                <div class="rounded-2xl border border-line bg-elevated/50 p-6">
+                    <i class="fa fa-wechat text-accent text-xl mb-3"></i>
+                    <h3 class="font-semibold text-white text-sm mb-1" data-i18n="contact.wx">微信</h3>
+                    <p class="text-sm text-zinc-400 font-mono">OpenMix_AI</p>
+                </div>
+            </div>
+            <a href="admin/register" class="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-accent text-surface font-semibold hover:bg-accent-dim transition-colors shadow-glow" data-i18n="contact.cta">开始使用</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 border-t border-line bg-surface/50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-10 mb-10">
+                <div class="md:col-span-1">
+                    <div class="flex items-baseline gap-1 mb-3">
+                        <span class="text-lg font-extrabold text-gradient">OpenMix</span>
+                        <span class="text-xs text-zinc-500">.ai</span>
+                    </div>
+                    <p class="text-sm text-zinc-500 leading-relaxed" data-i18n="foot.tag">统一 AI 模型网关，让集成更简单、运维更省心。</p>
+                </div>
+                <div>
+                    <h3 class="text-sm font-semibold text-white mb-3" data-i18n="foot.col1">产品</h3>
+                    <ul class="space-y-2 text-sm text-zinc-500">
+                        <li><a href="#features" class="hover:text-white transition-colors" data-i18n="nav.features">功能</a></li>
+                        <li><a href="#models" class="hover:text-white transition-colors" data-i18n="nav.models">模型</a></li>
+                        <li><a href="#pricing" class="hover:text-white transition-colors" data-i18n="nav.pricing">定价</a></li>
+                        <li><a href="#docs" class="hover:text-white transition-colors" data-i18n="nav.docs">文档</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-sm font-semibold text-white mb-3" data-i18n="foot.col2">资源</h3>
+                    <ul class="space-y-2 text-sm text-zinc-500">
+                        <li><a href="#" class="hover:text-white transition-colors" data-i18n="foot.r1">开发指南</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors" data-i18n="foot.r2">常见问题</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors" data-i18n="foot.r3">状态页</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-sm font-semibold text-white mb-3" data-i18n="foot.col3">法律</h3>
+                    <ul class="space-y-2 text-sm text-zinc-500">
+                        <li><a href="#" class="hover:text-white transition-colors" data-i18n="foot.l1">隐私政策</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors" data-i18n="foot.l2">服务条款</a></li>
+                        <li><a href="#contact" class="hover:text-white transition-colors" data-i18n="contact.heading">联系我们</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="pt-8 border-t border-line flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-zinc-600">
+                <p>© 2026 OpenMix.ai</p>
+                <p data-i18n="foot.icp">ICP 备案号：粤ICP备XXXXXXX号</p>
+            </div>
+        </div>
+    </footer>
+
+    <button type="button" id="to-top" class="fixed bottom-8 right-8 w-11 h-11 rounded-full border border-line bg-elevated/90 text-zinc-300 hover:text-white hover:border-accent/40 backdrop-blur z-50 transition-colors shadow-card" aria-label="Back to top">
+        <i class="fa fa-arrow-up" aria-hidden="true"></i>
+    </button>
+
+    <script>
+(function () {
+    var STR = {
+        'zh-CN': {
+            title: 'OpenMix — 一个 API，调用所有模型',
+            metaDesc: 'OpenMix — 统一 AI 模型 API 网关。OpenAI 兼容，智能路由，透明计费。',
+            'nav.features': '功能', 'nav.models': '模型', 'nav.docs': '文档', 'nav.pricing': '定价', 'nav.admin': '控制台',
+            'nav.try': '在线试用', 'nav.login': '登录',
+            'hero.badge': 'OpenAI 兼容 · 智能路由 · 透明计费',
+            'hero.title1': '一个', 'hero.title2': 'API Key', 'hero.title3': '，', 'hero.title4': '调用全球主流 AI 模型',
+            'hero.sub': '兼容 OpenAI 标准，无缝对接 GPT-4o、Claude、Gemini、通义、文心等 100+ 模型。统一计费、智能路由、企业级安全。',
+            'hero.cta1': '获取 API Key', 'hero.cta2': '查看文档',
+            'stats.models': '模型', 'stats.sla': '可用性目标', 'stats.api': '统一接口', 'stats.sub': '强制月租',
+            'playground.title': '在线快速试用', 'playground.keyph': '你的 API Key', 'playground.msgh': '输入消息...', 'playground.send': '发送请求',
+            'feat.heading': '为生产环境设计的统一网关', 'feat.sub': '更少集成成本，更高可用与可观测性。',
+            'feat.f1t': 'OpenAI 全兼容', 'feat.f1d': '零改造切换：替换 base URL 与 Key 即可，支持 chat、embeddings 等常用端点。',
+            'feat.f2t': '多模型聚合', 'feat.f2d': '国内外主流模型一站式接入，持续扩充，一个入口覆盖研发与业务场景。',
+            'feat.f3t': '智能路由', 'feat.f3d': '优选节点、负载与故障转移策略可配，降低延迟与中断风险。',
+            'feat.f4t': 'Token 级计费', 'feat.f4d': '按用量结算，实时用量与额度可视化，成本可控可审计。',
+            'feat.f5t': '密钥与权限', 'feat.f5d': '多 Key、分级权限与一键轮换，满足团队协作与安全基线。',
+            'feat.f6t': '安全合规', 'feat.f6d': '限流、审计日志与传输安全，可对接企业策略与私有化部署路径。',
+            'models.heading': '支持的模型与厂商', 'models.sub': '持续更新，覆盖主流实验室与云厂商。',
+            'models.cta': '在文档中查看完整列表', 'models.more': '更多',
+            'docs.heading': '几分钟完成接入', 'docs.sub': '兼容 OpenAI SDK 与 REST，以下示例可直接复制运行。',
+            'docs.copy': '复制', 'docs.full': '完整 API 文档',
+            'price.heading': '简单透明的定价', 'price.sub': '按 Token 用量计费，无隐藏月租（具体以控制台为准）。',
+            'price.p1t': '免费试用', 'price.p1a': '入门额度', 'price.p1b': '基础模型', 'price.p1c': '用量统计', 'price.p1btn': '注册',
+            'price.popular': '推荐', 'price.p2t': '专业版', 'price.mo': '/月', 'price.p2a': '更高额度', 'price.p2b': '全模型', 'price.p2c': '流式与日志', 'price.p2btn': '升级',
+            'price.p3t': '企业版', 'price.p3p': '定制', 'price.p3a': '专属与私有化', 'price.p3b': 'SLA 与支持', 'price.p3c': '合规与审计', 'price.p3btn': '联系销售',
+            'contact.heading': '联系我们', 'contact.sub': '合作、定制部署或技术支持，欢迎联络。',
+            'contact.mail': '邮箱', 'contact.wx': '微信', 'contact.cta': '开始使用',
+            'foot.tag': '统一 AI 模型网关，让集成更简单、运维更省心。',
+            'foot.col1': '产品', 'foot.col2': '资源', 'foot.col3': '法律',
+            'foot.r1': '开发指南', 'foot.r2': '常见问题', 'foot.r3': '状态页',
+            'foot.l1': '隐私政策', 'foot.l2': '服务条款', 'foot.icp': 'ICP 备案号：粤ICP备XXXXXXX号',
+            'copy.done': '已复制', 'top': '回到顶部'
+        },
+        'en': {
+            title: 'OpenMix — One API for Every Model',
+            metaDesc: 'OpenMix — unified AI API gateway. OpenAI-compatible, smart routing, transparent usage-based billing.',
+            'nav.features': 'Features', 'nav.models': 'Models', 'nav.docs': 'Docs', 'nav.pricing': 'Pricing', 'nav.admin': 'Dashboard',
+            'nav.try': 'Try it', 'nav.login': 'Sign in',
+            'hero.badge': 'OpenAI-compatible · Smart routing · Fair billing',
+            'hero.title1': 'One', 'hero.title2': 'API key', 'hero.title3': ', ', 'hero.title4': 'access leading AI models worldwide',
+            'hero.sub': 'Drop-in OpenAI-compatible API. GPT-4o, Claude, Gemini, Qwen, Ernie, and 100+ models. Unified billing, routing, and enterprise-ready security.',
+            'hero.cta1': 'Get API key', 'hero.cta2': 'Read the docs',
+            'stats.models': 'Models', 'stats.sla': 'Uptime target', 'stats.api': 'Single API', 'stats.sub': 'Forced subscription',
+            'playground.title': 'Quick try', 'playground.keyph': 'Your API key', 'playground.msgh': 'Message...', 'playground.send': 'Send request',
+            'feat.heading': 'A unified gateway built for production', 'feat.sub': 'Less integration overhead. More reliability and observability.',
+            'feat.f1t': 'OpenAI-compatible', 'feat.f1d': 'Swap base URL and key—use chat, embeddings, and common endpoints without rewrites.',
+            'feat.f2t': 'Multi-model hub', 'feat.f2d': 'Mainstream models from global and CN providers, continuously updated, one front door for teams.',
+            'feat.f3t': 'Smart routing', 'feat.f3d': 'Configurable failover and load strategies to cut latency and downtime.',
+            'feat.f4t': 'Token-based billing', 'feat.f4d': 'Pay for what you use with live usage dashboards and budgets.',
+            'feat.f5t': 'Keys & access', 'feat.f5d': 'Multiple keys, scoped permissions, and rotation for safer collaboration.',
+            'feat.f6t': 'Security & compliance', 'feat.f6d': 'Rate limits, audit logs, and transport security—ready for enterprise policies.',
+            'models.heading': 'Models & providers', 'models.sub': 'Regularly updated coverage across major labs and clouds.',
+            'models.cta': 'See full list in docs', 'models.more': 'More',
+            'docs.heading': 'Ship in minutes', 'docs.sub': 'Works with OpenAI SDKs and REST—copy, paste, run.',
+            'docs.copy': 'Copy', 'docs.full': 'Full API reference',
+            'price.heading': 'Simple, transparent pricing', 'price.sub': 'Usage-based by tokens. No hidden monthly minimums (see console for details).',
+            'price.p1t': 'Free tier', 'price.p1a': 'Starter credits', 'price.p1b': 'Core models', 'price.p1c': 'Usage stats', 'price.p1btn': 'Sign up',
+            'price.popular': 'Popular', 'price.p2t': 'Pro', 'price.mo': '/mo', 'price.p2a': 'Higher limits', 'price.p2b': 'All models', 'price.p2c': 'Streaming & logs', 'price.p2btn': 'Upgrade',
+            'price.p3t': 'Enterprise', 'price.p3p': 'Custom', 'price.p3a': 'Dedicated & VPC', 'price.p3b': 'SLA & support', 'price.p3c': 'Compliance', 'price.p3btn': 'Talk to sales',
+            'contact.heading': 'Contact', 'contact.sub': 'Partnerships, on-prem, and technical support.',
+            'contact.mail': 'Email', 'contact.wx': 'WeChat', 'contact.cta': 'Get started',
+            'foot.tag': 'One gateway for every model—simpler integration, calmer operations.',
+            'foot.col1': 'Product', 'foot.col2': 'Resources', 'foot.col3': 'Legal',
+            'foot.r1': 'Guides', 'foot.r2': 'FAQ', 'foot.r3': 'Status',
+            'foot.l1': 'Privacy', 'foot.l2': 'Terms', 'foot.icp': 'ICP filing: placeholder',
+            'copy.done': 'Copied', 'top': 'Back to top'
+        }
+    };
+
+    var LANG_KEY = 'openmix-lang';
+    var html = document.documentElement;
+
+    function getLang() {
+        var saved = localStorage.getItem(LANG_KEY);
+        if (saved === 'en' || saved === 'zh-CN') return saved;
+        var nav = navigator.language || '';
+        return nav.toLowerCase().startsWith('zh') ? 'zh-CN' : 'en';
+    }
+
+    function setActiveButtons(lang) {
+        var z = document.getElementById('lang-zh');
+        var e = document.getElementById('lang-en');
+        if (!z || !e) return;
+        if (lang === 'zh-CN') {
+            z.className = 'lang-btn px-2.5 py-1 rounded-md bg-white/10 text-white';
+            z.setAttribute('aria-pressed', 'true');
+            e.className = 'lang-btn px-2.5 py-1 rounded-md text-zinc-500 hover:text-zinc-300';
+            e.setAttribute('aria-pressed', 'false');
+        } else {
+            e.className = 'lang-btn px-2.5 py-1 rounded-md bg-white/10 text-white';
+            e.setAttribute('aria-pressed', 'true');
+            z.className = 'lang-btn px-2.5 py-1 rounded-md text-zinc-500 hover:text-zinc-300';
+            z.setAttribute('aria-pressed', 'false');
+        }
+    }
+
+    function applyLang(lang) {
+        var bundle = STR[lang] || STR['zh-CN'];
+        html.setAttribute('lang', lang === 'en' ? 'en' : 'zh-CN');
+        html.setAttribute('data-lang', lang);
+        document.title = bundle.title;
+        var meta = document.querySelector('meta[name="description"]');
+        if (meta && bundle.metaDesc) meta.setAttribute('content', bundle.metaDesc);
+
+        document.querySelectorAll('[data-i18n]').forEach(function (el) {
+            var key = el.getAttribute('data-i18n');
+            if (key && bundle[key] != null) el.textContent = bundle[key];
+        });
+        document.querySelectorAll('[data-i18n-placeholder]').forEach(function (el) {
+            var key = el.getAttribute('data-i18n-placeholder');
+            if (key && bundle[key] != null) el.setAttribute('placeholder', bundle[key]);
+        });
+
+        setActiveButtons(lang);
+        localStorage.setItem(LANG_KEY, lang);
+    }
+
+    document.getElementById('lang-zh').addEventListener('click', function () { applyLang('zh-CN'); });
+    document.getElementById('lang-en').addEventListener('click', function () { applyLang('en'); });
+
+    var menuBtn = document.getElementById('menu-btn');
+    var mobileMenu = document.getElementById('mobile-menu');
+    if (menuBtn && mobileMenu) {
+        menuBtn.addEventListener('click', function () {
+            mobileMenu.classList.toggle('hidden');
+            menuBtn.setAttribute('aria-expanded', String(!mobileMenu.classList.contains('hidden')));
+        });
+        mobileMenu.querySelectorAll('a').forEach(function (a) {
+            a.addEventListener('click', function () {
+                mobileMenu.classList.add('hidden');
+                menuBtn.setAttribute('aria-expanded', 'false');
+            });
+        });
+    }
+
+    document.querySelectorAll('.copy-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var id = btn.getAttribute('data-copy');
+            var pre = id ? document.getElementById(id) : null;
+            if (!pre) return;
+            var code = pre.querySelector('code');
+            var text = code ? code.textContent : pre.textContent;
+            function done() {
+                var lang = localStorage.getItem(LANG_KEY) || 'zh-CN';
+                var b = STR[lang] || STR['zh-CN'];
+                var orig = btn.textContent;
+                btn.textContent = b['copy.done'] || 'OK';
+                setTimeout(function () { btn.textContent = orig; }, 1500);
+            }
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(done).catch(function () {});
+            }
+        });
+    });
+
+    document.getElementById('to-top').addEventListener('click', function () {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    applyLang(getLang());
+})();
+    </script>
+</body>
+</html>
