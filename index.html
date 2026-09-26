@@ -72,9 +72,6 @@
                 transform: translateY(-4px);
                 box-shadow: 0 0 0 1px rgba(34, 211, 163, 0.15), 0 24px 48px -20px rgba(0, 0, 0, 0.6);
             }
-            .vendor-tag {
-                @apply px-2 py-0.5 rounded-md text-xs font-medium bg-white/5 text-accent border border-white/10;
-            }
         }
         /* 架构图动画（源自 openmix.ai 首页 GatewayArchitecture） */
         .gateway-arch-svg .gateway-arch-flow {
@@ -118,8 +115,6 @@
                 </a>
                 <div class="hidden lg:flex items-center gap-8 text-sm font-medium">
                     <a href="#features" class="text-zinc-400 hover:text-white transition-colors" data-i18n="nav.features">功能</a>
-                    <a href="#vendors" class="text-zinc-400 hover:text-white transition-colors" data-i18n="nav.vendors">厂商</a>
-                    <a href="#quickstart" class="text-zinc-400 hover:text-white transition-colors" data-i18n="nav.quickstart">快速开始</a>
                     <a href="/docs/help" class="text-zinc-400 hover:text-white transition-colors" data-i18n="nav.docs">文档</a>
                     <a href="/user/dashboard" class="text-zinc-400 hover:text-white transition-colors" data-i18n="nav.console">控制台</a>
                 </div>
@@ -139,8 +134,6 @@
             </div>
             <div id="mobile-menu" class="lg:hidden hidden border-t border-line py-4 flex flex-col gap-3 text-sm font-medium">
                 <a href="#features" class="text-zinc-400 hover:text-white" data-i18n="nav.features">功能</a>
-                <a href="#vendors" class="text-zinc-400 hover:text-white" data-i18n="nav.vendors">厂商</a>
-                <a href="#quickstart" class="text-zinc-400 hover:text-white" data-i18n="nav.quickstart">快速开始</a>
                 <a href="/docs/help" class="text-zinc-400 hover:text-white" data-i18n="nav.docs">文档</a>
                 <a href="/user/dashboard" class="text-zinc-400 hover:text-white" data-i18n="nav.console">控制台</a>
             </div>
@@ -165,7 +158,7 @@
                     OpenMix 统一封装不同大模型厂商的接口，提供请求转发、配额管理、调用日志观测，支持自托管部署，快速对接多家 AI 服务。
                 </p>
                 <div class="flex flex-col sm:flex-row gap-3 justify-center">
-                    <a href="#quickstart" class="inline-flex justify-center items-center px-8 py-3.5 rounded-xl bg-accent text-surface font-semibold hover:bg-accent-dim transition-all shadow-glow text-base" data-i18n="hero.cta1">快速开始</a>
+                    <a href="/docs/help" class="inline-flex justify-center items-center px-8 py-3.5 rounded-xl bg-accent text-surface font-semibold hover:bg-accent-dim transition-all shadow-glow text-base" data-i18n="hero.cta1">快速开始</a>
                     <a href="https://github.com/openmixai" target="_blank" rel="noreferrer" class="inline-flex justify-center items-center gap-2 px-8 py-3.5 rounded-xl border border-line bg-elevated/50 text-white font-semibold hover:bg-white/5 transition-colors text-base" data-i18n="hero.cta2">GitHub 仓库</a>
                 </div>
             </div>
@@ -242,8 +235,8 @@
                         <g class="gateway-arch-vendor" style="animation-delay: 0.22s">
                             <rect x="740" y="63" width="180" height="30" rx="8" fill="#0f1118" stroke="rgba(255,255,255,0.08)" />
                             <circle cx="758" cy="78" r="5" fill="#38bdf8" opacity="0.9" />
-                            <text x="772" y="79" dominant-baseline="middle" fill="#a1a1aa" font-size="9" font-weight="700" font-family="JetBrains Mono, ui-monospace, monospace">百</text>
-                            <text x="816" y="79" dominant-baseline="middle" fill="#e4e4e7" font-size="12" font-weight="600" font-family="Plus Jakarta Sans, system-ui, sans-serif" data-i18n="arch.v.bailian">阿里百炼</text>
+                            <text x="772" y="79" dominant-baseline="middle" fill="#a1a1aa" font-size="9" font-weight="700" font-family="JetBrains Mono, ui-monospace, monospace">Q</text>
+                            <text x="816" y="79" dominant-baseline="middle" fill="#e4e4e7" font-size="12" font-weight="600" font-family="Plus Jakarta Sans, system-ui, sans-serif" data-i18n="arch.v.qwen">Qwen</text>
                         </g>
                         <g class="gateway-arch-vendor" style="animation-delay: 0.27s">
                             <rect x="740" y="109" width="180" height="30" rx="8" fill="#0f1118" stroke="rgba(255,255,255,0.08)" />
@@ -254,20 +247,20 @@
                         <g class="gateway-arch-vendor" style="animation-delay: 0.32s">
                             <rect x="740" y="155" width="180" height="30" rx="8" fill="#0f1118" stroke="rgba(255,255,255,0.08)" />
                             <circle cx="758" cy="170" r="5" fill="#a3e635" opacity="0.9" />
-                            <text x="772" y="171" dominant-baseline="middle" fill="#a1a1aa" font-size="9" font-weight="700" font-family="JetBrains Mono, ui-monospace, monospace">OAI</text>
-                            <text x="816" y="171" dominant-baseline="middle" fill="#e4e4e7" font-size="12" font-weight="600" font-family="Plus Jakarta Sans, system-ui, sans-serif" data-i18n="arch.v.openai">OpenAI</text>
+                            <text x="772" y="171" dominant-baseline="middle" fill="#a1a1aa" font-size="9" font-weight="700" font-family="JetBrains Mono, ui-monospace, monospace">GPT</text>
+                            <text x="816" y="171" dominant-baseline="middle" fill="#e4e4e7" font-size="12" font-weight="600" font-family="Plus Jakarta Sans, system-ui, sans-serif" data-i18n="arch.v.gpt">GPT</text>
                         </g>
                         <g class="gateway-arch-vendor" style="animation-delay: 0.37s">
                             <rect x="740" y="201" width="180" height="30" rx="8" fill="#0f1118" stroke="rgba(255,255,255,0.08)" />
                             <circle cx="758" cy="216" r="5" fill="#fbbf24" opacity="0.9" />
-                            <text x="772" y="217" dominant-baseline="middle" fill="#a1a1aa" font-size="9" font-weight="700" font-family="JetBrains Mono, ui-monospace, monospace">A</text>
-                            <text x="816" y="217" dominant-baseline="middle" fill="#e4e4e7" font-size="12" font-weight="600" font-family="Plus Jakarta Sans, system-ui, sans-serif" data-i18n="arch.v.anthropic">Anthropic</text>
+                            <text x="772" y="217" dominant-baseline="middle" fill="#a1a1aa" font-size="9" font-weight="700" font-family="JetBrains Mono, ui-monospace, monospace">C</text>
+                            <text x="816" y="217" dominant-baseline="middle" fill="#e4e4e7" font-size="12" font-weight="600" font-family="Plus Jakarta Sans, system-ui, sans-serif" data-i18n="arch.v.claude">Claude</text>
                         </g>
                         <g class="gateway-arch-vendor" style="animation-delay: 0.42s">
                             <rect x="740" y="247" width="180" height="30" rx="8" fill="#0f1118" stroke="rgba(255,255,255,0.08)" />
-                            <circle cx="758" cy="262" r="5" fill="#94a3b8" opacity="0.9" />
-                            <text x="772" y="263" dominant-baseline="middle" fill="#a1a1aa" font-size="9" font-weight="700" font-family="JetBrains Mono, ui-monospace, monospace">SF</text>
-                            <text x="816" y="263" dominant-baseline="middle" fill="#e4e4e7" font-size="12" font-weight="600" font-family="Plus Jakarta Sans, system-ui, sans-serif" data-i18n="arch.v.siliconflow">SiliconFlow</text>
+                            <circle cx="758" cy="262" r="5" fill="#4285f4" opacity="0.9" />
+                            <text x="772" y="263" dominant-baseline="middle" fill="#a1a1aa" font-size="9" font-weight="700" font-family="JetBrains Mono, ui-monospace, monospace">G</text>
+                            <text x="816" y="263" dominant-baseline="middle" fill="#e4e4e7" font-size="12" font-weight="600" font-family="Plus Jakarta Sans, system-ui, sans-serif" data-i18n="arch.v.gemini">Gemini</text>
                         </g>
                     </g>
                 </svg>
@@ -289,7 +282,7 @@
                         <svg class="w-5 h-5" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h14v9H3zM6 10h8v6H6z" /></svg>
                     </div>
                     <h3 class="text-lg font-semibold text-white mb-2" data-i18n="feat.f1t">多模型统一接入</h3>
-                    <p class="text-zinc-400 text-sm leading-relaxed" data-i18n="feat.f1d">一套 API 对接 OpenAI、DeepSeek、阿里百炼等主流大模型，无需逐个适配 SDK。</p>
+                    <p class="text-zinc-400 text-sm leading-relaxed" data-i18n="feat.f1d">一套 API 对接 GPT、Claude、DeepSeek、Qwen 等主流大模型，无需逐个适配 SDK。</p>
                 </article>
                 <article class="rounded-2xl border border-line bg-elevated/50 p-7 card-hover">
                     <div class="w-11 h-11 rounded-xl bg-violet/10 border border-violet/20 flex items-center justify-center mb-5 text-violet">
@@ -313,84 +306,6 @@
                     <p class="text-zinc-400 text-sm leading-relaxed" data-i18n="feat.f4d">智能路由、协议转换、流式透传，确保请求稳定可靠地到达目标厂商。</p>
                 </article>
             </div>
-        </div>
-    </section>
-
-    <!-- Vendors -->
-    <section id="vendors" class="py-20 border-t border-line bg-elevated/30">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-12 max-w-2xl mx-auto">
-                <h2 class="text-3xl font-extrabold text-white tracking-tight mb-2" data-i18n="vendors.heading">支持的模型厂商</h2>
-                <p class="text-zinc-400" data-i18n="vendors.sub">持续扩展，覆盖主流实验室与云厂商。</p>
-            </div>
-            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
-                <div class="rounded-xl border border-line bg-surface/80 p-4 text-center card-hover"><span class="vendor-tag">阿里百炼</span><p class="mt-2 text-sm font-mono text-zinc-300">qwen</p></div>
-                <div class="rounded-xl border border-line bg-surface/80 p-4 text-center card-hover"><span class="vendor-tag">DeepSeek</span><p class="mt-2 text-sm font-mono text-zinc-300">deepseek-chat</p></div>
-                <div class="rounded-xl border border-line bg-surface/80 p-4 text-center card-hover"><span class="vendor-tag">OpenAI</span><p class="mt-2 text-sm font-mono text-zinc-300">gpt-4o</p></div>
-                <div class="rounded-xl border border-line bg-surface/80 p-4 text-center card-hover"><span class="vendor-tag">Anthropic</span><p class="mt-2 text-sm font-mono text-zinc-300">claude</p></div>
-                <div class="rounded-xl border border-line bg-surface/80 p-4 text-center card-hover"><span class="vendor-tag">SiliconFlow</span><p class="mt-2 text-sm font-mono text-zinc-300">open models</p></div>
-                <a href="/docs/help" class="rounded-xl border border-line bg-surface/80 p-4 text-center card-hover flex flex-col items-center justify-center">
-                    <span class="vendor-tag">—</span>
-                    <p class="mt-2 text-sm text-zinc-500" data-i18n="vendors.more">更多</p>
-                </a>
-            </div>
-        </div>
-    </section>
-
-    <!-- Quickstart -->
-    <section id="quickstart" class="py-20 border-t border-line">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-14 max-w-2xl mx-auto">
-                <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight mb-4" data-i18n="docs.heading">几分钟完成接入</h2>
-                <p class="text-zinc-400 text-lg" data-i18n="docs.sub">兼容 OpenAI SDK 与 REST；同时支持 Docker 自托管。</p>
-            </div>
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div class="rounded-2xl border border-line bg-elevated/50 overflow-hidden">
-                    <div class="flex items-center justify-between px-4 py-3 border-b border-line bg-surface/50">
-                        <span class="text-sm font-semibold text-white flex items-center gap-2"><i class="fa fa-terminal text-accent"></i> cURL</span>
-                        <button type="button" class="copy-btn text-xs text-zinc-500 hover:text-accent font-mono" data-copy="curl-code" data-i18n="docs.copy">复制</button>
-                    </div>
-                    <pre id="curl-code" class="p-4 overflow-x-auto text-xs sm:text-sm font-mono text-zinc-300 leading-relaxed bg-surface/80"><code>curl https://openmix.ai/v1/chat/completions \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer sk-openmix-***" \
-  -d '{
-    "model": "openai/gpt-4o",
-    "messages": [
-      {"role": "user", "content": "Hello, OpenMix!"}
-    ],
-    "stream": true
-  }'</code></pre>
-                </div>
-                <div class="rounded-2xl border border-line bg-elevated/50 overflow-hidden">
-                    <div class="flex items-center justify-between px-4 py-3 border-b border-line bg-surface/50">
-                        <span class="text-sm font-semibold text-white flex items-center gap-2"><i class="fa fa-code text-accent"></i> Python</span>
-                        <button type="button" class="copy-btn text-xs text-zinc-500 hover:text-accent font-mono" data-copy="py-code" data-i18n="docs.copy">复制</button>
-                    </div>
-                    <pre id="py-code" class="p-4 overflow-x-auto text-xs sm:text-sm font-mono text-zinc-300 leading-relaxed bg-surface/80"><code>from openai import OpenAI
-
-client = OpenAI(
-    base_url="https://openmix.ai/v1",
-    api_key="sk-openmix-***",
-)
-
-r = client.chat.completions.create(
-    model="qwen/qwen-72b",
-    messages=[{"role": "user", "content": "Hello!"}],
-)
-print(r.choices[0].message.content)</code></pre>
-                </div>
-                <div class="rounded-2xl border border-line bg-elevated/50 overflow-hidden">
-                    <div class="flex items-center justify-between px-4 py-3 border-b border-line bg-surface/50">
-                        <span class="text-sm font-semibold text-white flex items-center gap-2"><i class="fa fa-cubes text-accent"></i> <span data-i18n="docs.deploy">自托管部署</span></span>
-                        <button type="button" class="copy-btn text-xs text-zinc-500 hover:text-accent font-mono" data-copy="docker-code" data-i18n="docs.copy">复制</button>
-                    </div>
-                    <pre id="docker-code" class="p-4 overflow-x-auto text-xs sm:text-sm font-mono text-zinc-300 leading-relaxed bg-surface/80"><code># 自托管：Docker 一键启动
-docker compose up -d --build</code></pre>
-                </div>
-            </div>
-            <p class="mt-8 text-center">
-                <a href="/docs/help" class="inline-flex items-center gap-2 text-sm font-semibold text-accent hover:text-accent-dim transition-colors" data-i18n="docs.full">完整文档与部署指南</a>
-            </p>
         </div>
     </section>
 
@@ -472,8 +387,6 @@ docker compose up -d --build</code></pre>
                     <h3 class="text-sm font-semibold text-white mb-3" data-i18n="foot.col1">产品</h3>
                     <ul class="space-y-2 text-sm text-zinc-500">
                         <li><a href="#features" class="hover:text-white transition-colors" data-i18n="nav.features">功能</a></li>
-                        <li><a href="#vendors" class="hover:text-white transition-colors" data-i18n="nav.vendors">厂商</a></li>
-                        <li><a href="#quickstart" class="hover:text-white transition-colors" data-i18n="nav.quickstart">快速开始</a></li>
                         <li><a href="/docs/help" class="hover:text-white transition-colors" data-i18n="nav.docs">文档</a></li>
                     </ul>
                 </div>
@@ -503,7 +416,7 @@ docker compose up -d --build</code></pre>
         'zh-CN': {
             title: 'OpenMix — 开源 AI 聚合网关',
             metaDesc: 'OpenMix 是一款开源的 AI 聚合网关，统一封装主流大模型接口，提供请求转发、配额管理与用量观测，支持自托管。',
-            'nav.features': '功能', 'nav.vendors': '厂商', 'nav.quickstart': '快速开始', 'nav.docs': '文档', 'nav.console': '控制台',
+            'nav.features': '功能', 'nav.docs': '文档', 'nav.console': '控制台',
             'nav.login': '登录',
             'hero.badge': '开源 · AI 聚合网关 · 自托管',
             'hero.title1': '开源的', 'hero.title2': 'AI 聚合网关', 'hero.title3': '，统一接入主流大模型',
@@ -511,16 +424,12 @@ docker compose up -d --build</code></pre>
             'hero.cta1': '快速开始', 'hero.cta2': 'GitHub 仓库',
             'arch.left.title': '用户 / 应用', 'arch.left.subtitle': 'IDE · 业务系统',
             'arch.center.subtitle': 'AI 聚合网关', 'arch.center.caps': '鉴权 - 路由 - 统计', 'arch.right.title': '模型厂商',
-            'arch.v.bailian': '阿里百炼', 'arch.v.deepseek': 'DeepSeek', 'arch.v.openai': 'OpenAI', 'arch.v.anthropic': 'Anthropic', 'arch.v.siliconflow': 'SiliconFlow',
+            'arch.v.qwen': 'Qwen', 'arch.v.deepseek': 'DeepSeek', 'arch.v.gpt': 'GPT', 'arch.v.claude': 'Claude', 'arch.v.gemini': 'Gemini',
             'feat.heading': '核心能力', 'feat.sub': '统一接入、观测、计费与转发。',
-            'feat.f1t': '多模型统一接入', 'feat.f1d': '一套 API 对接 OpenAI、DeepSeek、阿里百炼等主流大模型，无需逐个适配 SDK。',
+            'feat.f1t': '多模型统一接入', 'feat.f1d': '一套 API 对接 GPT、Claude、DeepSeek、Qwen 等主流大模型，无需逐个适配 SDK。',
             'feat.f2t': '用量日志观测', 'feat.f2d': '每次请求记录耗时、状态与错误摘要，按模型/渠道/时间维度检索与分析。',
             'feat.f3t': '配额计费管理', 'feat.f3d': '按渠道分配 Token 配额，支持余额查询、超限告警与用量结算。',
             'feat.f4t': '请求转发治理', 'feat.f4d': '智能路由、协议转换、流式透传，确保请求稳定可靠地到达目标厂商。',
-            'vendors.heading': '支持的模型厂商', 'vendors.sub': '持续扩展，覆盖主流实验室与云厂商。',
-            'vendors.more': '更多',
-            'docs.heading': '几分钟完成接入', 'docs.sub': '兼容 OpenAI SDK 与 REST；同时支持 Docker 自托管。',
-            'docs.copy': '复制', 'docs.deploy': '自托管部署', 'docs.full': '完整文档与部署指南',
             'license.heading': '开源 · 自由部署', 'license.sub': 'MIT 协议开源，数据自主可控，可自由二次开发与私有化部署。',
             'license.l1t': 'MIT 开源', 'license.l1d': '代码完全开源，MIT License，商用友好。',
             'license.l2t': '自托管', 'license.l2d': '一键 Docker 部署，数据留在你自己的基础设施。',
@@ -531,13 +440,12 @@ docker compose up -d --build</code></pre>
             'contact.cta': '开始使用',
             'foot.tag': '开源的 AI 聚合网关，统一接入多家大模型。',
             'foot.col1': '产品', 'foot.col2': '资源',
-            'foot.r1': 'GitHub', 'foot.r2': '部署文档', 'foot.r3': '常见问题',
-            'copy.done': '已复制', 'top': '回到顶部'
+            'foot.r1': 'GitHub', 'foot.r2': '部署文档', 'foot.r3': '常见问题'
         },
         'en': {
             title: 'OpenMix — Open-source AI Gateway',
             metaDesc: 'OpenMix is an open-source AI aggregation gateway: unify APIs from major model providers with request relay, quota management, and usage observability. Self-hostable.',
-            'nav.features': 'Features', 'nav.vendors': 'Providers', 'nav.quickstart': 'Quickstart', 'nav.docs': 'Docs', 'nav.console': 'Console',
+            'nav.features': 'Features', 'nav.docs': 'Docs', 'nav.console': 'Console',
             'nav.login': 'Sign in',
             'hero.badge': 'Open-source · AI gateway · Self-hosted',
             'hero.title1': 'An open-source', 'hero.title2': 'AI aggregation gateway', 'hero.title3': ' for every major model',
@@ -545,16 +453,12 @@ docker compose up -d --build</code></pre>
             'hero.cta1': 'Quickstart', 'hero.cta2': 'View on GitHub',
             'arch.left.title': 'Users / Apps', 'arch.left.subtitle': 'IDE · Business systems',
             'arch.center.subtitle': 'AI Aggregation Gateway', 'arch.center.caps': 'Auth - Routing - Stats', 'arch.right.title': 'Model Vendors',
-            'arch.v.bailian': 'Alibaba Bailian', 'arch.v.deepseek': 'DeepSeek', 'arch.v.openai': 'OpenAI', 'arch.v.anthropic': 'Anthropic', 'arch.v.siliconflow': 'SiliconFlow',
+            'arch.v.qwen': 'Qwen', 'arch.v.deepseek': 'DeepSeek', 'arch.v.gpt': 'GPT', 'arch.v.claude': 'Claude', 'arch.v.gemini': 'Gemini',
             'feat.heading': 'Core capabilities', 'feat.sub': 'Unified access, observability, billing, and relay.',
-            'feat.f1t': 'Unified multi-model access', 'feat.f1d': 'One API for OpenAI, DeepSeek, Alibaba Bailian, and more — no per-vendor SDK adaptation.',
+            'feat.f1t': 'Unified multi-model access', 'feat.f1d': 'One API for GPT, Claude, DeepSeek, Qwen, and more — no per-vendor SDK adaptation.',
             'feat.f2t': 'Usage log observability', 'feat.f2d': 'Every request logged with latency, status, and error summaries. Filter by model, channel, or time range.',
             'feat.f3t': 'Quota & billing', 'feat.f3d': 'Set token quotas per channel, query balances, and receive alerts on overage or depletion.',
             'feat.f4t': 'Request relay control', 'feat.f4d': 'Intelligent routing, protocol conversion, and streaming relay — requests reach vendors reliably.',
-            'vendors.heading': 'Supported providers', 'vendors.sub': 'Regularly updated coverage across major labs and clouds.',
-            'vendors.more': 'More',
-            'docs.heading': 'Ship in minutes', 'docs.sub': 'Works with OpenAI SDKs and REST — and Docker for self-hosting.',
-            'docs.copy': 'Copy', 'docs.deploy': 'Self-host', 'docs.full': 'Full docs & deploy guide',
             'license.heading': 'Open-source · self-hosted', 'license.sub': 'MIT-licensed, your data stays yours — extend and deploy privately.',
             'license.l1t': 'MIT open-source', 'license.l1d': 'Fully open source under MIT — commercial-friendly.',
             'license.l2t': 'Self-hosted', 'license.l2d': 'One-command Docker deploy; data stays on your infrastructure.',
@@ -565,8 +469,7 @@ docker compose up -d --build</code></pre>
             'contact.cta': 'Get started',
             'foot.tag': 'An open-source AI aggregation gateway for every major model.',
             'foot.col1': 'Product', 'foot.col2': 'Resources',
-            'foot.r1': 'GitHub', 'foot.r2': 'Deploy guide', 'foot.r3': 'FAQ',
-            'copy.done': 'Copied', 'top': 'Back to top'
+            'foot.r1': 'GitHub', 'foot.r2': 'Deploy guide', 'foot.r3': 'FAQ'
         }
     };
 
@@ -635,26 +538,6 @@ docker compose up -d --build</code></pre>
             });
         });
     }
-
-    document.querySelectorAll('.copy-btn').forEach(function (btn) {
-        btn.addEventListener('click', function () {
-            var id = btn.getAttribute('data-copy');
-            var pre = id ? document.getElementById(id) : null;
-            if (!pre) return;
-            var code = pre.querySelector('code');
-            var text = code ? code.textContent : pre.textContent;
-            function done() {
-                var lang = localStorage.getItem(LANG_KEY) || 'zh-CN';
-                var b = STR[lang] || STR['zh-CN'];
-                var orig = btn.textContent;
-                btn.textContent = b['copy.done'] || 'OK';
-                setTimeout(function () { btn.textContent = orig; }, 1500);
-            }
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(text).then(done).catch(function () {});
-            }
-        });
-    });
 
     document.getElementById('to-top').addEventListener('click', function () {
         window.scrollTo({ top: 0, behavior: 'smooth' });
